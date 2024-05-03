@@ -3,14 +3,7 @@
 #define __MODULE__ "main"
 
 #include "debug.h"
-
-void console_command_handle(char *result)
-{
-	if(__check_cmd("hello"))
-	{
-		debug("hi there\n");
-	}
-}
+#include "dgk.h"
 
 void console_flush(void)
 {
@@ -35,6 +28,18 @@ void console_send_string(char *buf, uint32_t size)
   Serial.write(buf, size);
 }
 
+void console_command_handle(char *result)
+{
+	if(__check_cmd("hello"))
+	{
+		debug("hi there\n");
+	}
+  else if(__check_cmd("dgk "))
+  {
+    dgk_console_handle(__param_pos("dgk "));
+  }
+}
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -46,6 +51,7 @@ void setup() {
 	debug_bsp.console_send_string = console_send_string;
   user_debug_init(debug_bsp);
   debug("BOSCH DGK test tool\n");
+  dgk_init();
   
 }
 
@@ -56,4 +62,5 @@ void loop() {
 	{
 		console_command_handle(result);
 	}
+  dgk_process();
 }
